@@ -4,11 +4,11 @@ var ethervote, ethervoteContract, proposalHash, totalVotes, proposal, totalPro, 
 var voteMap = {};
 
 var contractAddress = '0x1e9d5e4ed8ef31cfece10b4c92c9057f991f36bc';
-var contractAddressTestnet = '0x47ab800a75990b0bd5bb4a54cfbec777972c973c';
+var contractAddressTestnet = '0xdc6a608cCee017c8b83e641b569791B7e1B4D3AA';
 
 var startingBlock = 1800000;
 
-var contractABI = [{"constant":false,"inputs":[{"name":"proposalHash","type":"bytes32"},{"name":"pro","type":"bool"}],"name":"vote","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"proposalHash","type":"bytes32"},{"indexed":false,"name":"pro","type":"bool"},{"indexed":false,"name":"addr","type":"address"}],"name":"LogVote","type":"event"}];
+var contractABI = [{"constant":false,"inputs":[{"name":"proposal","type":"string"},{"name":"pro","type":"bool"}],"name":"vote","outputs":[],"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"proposal","type":"string"},{"indexed":false,"name":"pro","type":"bool"},{"indexed":false,"name":"addr","type":"address"}],"name":"LogVote","type":"event"}];
 var history = [];
 
 function init() {
@@ -89,7 +89,7 @@ function init() {
             // if bytecode is small, then try switching networks
             if (r.length < 3) {
                 contractAddress = contractAddressTestnet;
-                startingBlock = 1000000;
+                startingBlock = 1537636;
             }
 
             // Load the contract
@@ -153,7 +153,7 @@ function watchVotes() {
 
 
     // LogVote is an event on the contract. Read all since block 1 million
-    var logVotes = ethervote.LogVote({proposalHash: proposalHash}, {fromBlock: startingBlock});
+    var logVotes = ethervote.LogVote({proposal: proposal}, {fromBlock: startingBlock});
     
     // Wait for the events to be loaded
     console.time('watch')
@@ -264,7 +264,7 @@ function vote(support) {
     if (web3.eth.accounts && web3.eth.accounts.length > 0) {
         
         // Create a dialog requesting the transaction
-        ethervote.vote(proposalHash, support, {from: web3.eth.accounts[0]})
+        ethervote.vote(proposal, support, {from: web3.eth.accounts[0]})
         document.getElementById('status').textContent = 'Waiting for new block...';
 
       } else {
@@ -273,7 +273,7 @@ function vote(support) {
             console.log('return account', e, account);
             if(!e) {
                 // Create a dialog requesting the transaction
-                ethervote.vote(proposalHash, support, {from: account.toLowerCase()})
+                ethervote.vote(proposal, support, {from: account.toLowerCase()})
                 document.getElementById('status').textContent = 'Waiting for new block...';
             }
         });

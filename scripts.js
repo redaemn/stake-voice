@@ -155,9 +155,7 @@ function watchVotes() {
     // LogVote is an event on the contract. Read all since block 1 million
     var logVotes = ethervote.LogVote({proposal: proposal}, {fromBlock: startingBlock});
     
-    // Wait for the events to be loaded
-    console.time('watch')
-    logVotes.watch(function(error, res){
+    var logVotesCallback = function logVotesCallback (error, res) {
 
         console.log('event received');
 
@@ -183,7 +181,14 @@ function watchVotes() {
             calculateVotes();
             console.timeEnd('watch');
         }
-    })
+    };
+    
+    // Calculate all past votes
+    logVotes.get(logVotesCallback);
+    
+    // Wait for the events to be loaded
+    console.time('watch');
+    logVotes.watch(logVotesCallback);
 }
 
 function convertToString(vote, total){
